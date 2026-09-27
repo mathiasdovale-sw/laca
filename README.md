@@ -98,7 +98,9 @@ Todas las imágenes piden **texto alternativo obligatorio**. Cada documento tien
 
 ### Invitar a quien edita
 
-<https://www.sanity.io/manage> → proyecto → **Members** → _Invite_. Para alguien que solo carga contenido alcanza con el rol **Editor**.
+<https://www.sanity.io/manage> → proyecto → **Members** → _Invite_.
+
+En el plan **Free** de Sanity solo hay dos roles: **Administrator** (puede editar contenido y también cambiar la configuración del proyecto: miembros, CORS, webhooks, tokens) y **Viewer** (solo lectura). Quien carga contenido tiene que ser **Administrator**. El rol **Editor** (solo contenido) requiere el plan Growth.
 
 ### CORS
 
