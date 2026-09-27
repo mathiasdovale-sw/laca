@@ -1,14 +1,30 @@
 @import "tailwindcss";
 
 /*
- * Estilos base del template. La tipografía es la del sistema (font-sans por
- * defecto de Tailwind). Para rediseñar, empezá por los colores de @theme.
+ * Tokens de diseño. La tipografía (Inter Tight) se carga con next/font en
+ * src/lib/fonts.ts y llega acá como la variable --font-inter-tight.
  */
+@theme inline {
+  --font-sans:
+    var(--font-inter-tight), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
 @theme {
-  --color-background: var(--color-white);
-  --color-foreground: var(--color-neutral-900);
-  --color-muted: var(--color-neutral-500);
-  --color-border: var(--color-neutral-200);
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-muted: #8a8a8a;
+  --color-border: #d4d4d4;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {

@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 
 import "../globals.css";
 
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
+import { SiteShell } from "@/components/SiteShell";
 import { fallbackSiteTitle, siteUrl } from "@/lib/site";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { settingsQuery } from "@/sanity/lib/queries";
@@ -28,11 +27,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function SiteLayout({ children }: LayoutProps<"/">) {
-  return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </div>
-  );
+  return <SiteShell>{children}</SiteShell>;
 }

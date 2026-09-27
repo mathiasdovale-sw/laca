@@ -200,31 +200,66 @@ async function main() {
     })),
   };
 
+  const projectRefs = projects.map((p) => ({
+    _type: "reference",
+    _ref: p._id,
+    _key: p._id,
+  }));
+
   const home = {
     _id: "home",
     _type: "home",
-    intro:
-      "Texto de presentación de ejemplo. Estudio de arquitectura dedicado a vivienda, espacios comerciales e interiorismo.",
-    featuredProjects: projects.map((p) => ({
-      _type: "reference",
-      _ref: p._id,
-      _key: p._id,
-    })),
+    heroProjects: projectRefs,
+    intro: [
+      {
+        _type: "block",
+        _key: "i1",
+        style: "normal",
+        markDefs: [],
+        children: [
+          { _type: "span", _key: "i1a", text: "En ", marks: [] },
+          {
+            _type: "span",
+            _key: "i1b",
+            text: "laca.estudio",
+            marks: ["strong"],
+          },
+          {
+            _type: "span",
+            _key: "i1c",
+            text: " concebimos la arquitectura como un proceso compartido que acompaña a nuestros clientes desde la concepción de una idea hasta su materialización final.",
+            marks: [],
+          },
+        ],
+      },
+    ],
+    featuredProjects: projectRefs,
+    studioHeading: "Cada proyecto comienza escuchando.",
+    studioText:
+      "Interpretamos lo que necesitás y lo transformamos en espacios pensados para ser vividos, donde la arquitectura responde tanto a las personas como al lugar.",
+    studioImage: await uploadImage(
+      "estudio",
+      175,
+      "Interior de un proyecto del estudio",
+    ),
   };
 
   // Datos de contacto inventados: reemplazarlos desde el Studio.
   const settings = {
     _id: "settings",
     _type: "settings",
-    siteTitle: "Estudio LACA",
+    siteTitle: "laca.estudio",
     siteDescription: "Estudio de arquitectura en Buenos Aires.",
     email: "hola@estudiolaca.com",
     phone: "+54 11 5555-0000",
     address: "Av. Ejemplo 1234, Piso 5\nCABA, Buenos Aires",
+    location: "Buenos Aires, Argentina",
     mapsUrl: "https://maps.google.com/?q=Buenos+Aires",
     instagram: "https://www.instagram.com/estudiolaca",
     linkedin: "https://www.linkedin.com/company/estudiolaca",
-    facebook: "https://www.facebook.com/estudiolaca",
+    contactTitle: "¿Tenés un proyecto en mente?",
+    contactText:
+      "Dejanos tus datos y nos pondremos en contacto con vos para conocer tu idea y acompañarte en todo el proceso.",
     contactFormRecipient: "alamas@estudiolaca.com",
   };
 

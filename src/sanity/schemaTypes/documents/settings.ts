@@ -10,7 +10,7 @@ export const settings = defineType({
     { name: "general", title: "General", default: true },
     { name: "contact", title: "Contacto" },
     { name: "social", title: "Redes sociales" },
-    { name: "form", title: "Formulario" },
+    { name: "form", title: "Bloque de contacto" },
   ],
   fields: [
     defineField({
@@ -54,6 +54,14 @@ export const settings = defineType({
       group: "contact",
     }),
     defineField({
+      name: "location",
+      title: "Ubicación del estudio",
+      description:
+        "Versión corta que se muestra en el bloque de contacto y el footer. Ej.: “Buenos Aires, Argentina”.",
+      type: "string",
+      group: "contact",
+    }),
+    defineField({
       name: "mapsUrl",
       title: "Enlace a Google Maps",
       type: "url",
@@ -75,11 +83,21 @@ export const settings = defineType({
       group: "social",
     }),
     defineField({
-      name: "facebook",
-      title: "Facebook",
-      description: "Enlace completo a la página de Facebook.",
-      type: "url",
-      group: "social",
+      name: "contactTitle",
+      title: "Título",
+      description:
+        "Título del bloque negro de contacto que aparece al final de todas las páginas.",
+      type: "string",
+      group: "form",
+      initialValue: "¿Tenés un proyecto en mente?",
+    }),
+    defineField({
+      name: "contactText",
+      title: "Texto",
+      description: "Texto breve que acompaña al título.",
+      type: "text",
+      rows: 3,
+      group: "form",
     }),
     defineField({
       name: "contactFormRecipient",

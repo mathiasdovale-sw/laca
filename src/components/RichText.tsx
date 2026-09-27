@@ -4,7 +4,8 @@ import {
   type PortableTextComponents,
 } from "next-sanity";
 
-import type { RichText as RichTextValue } from "@/sanity/types";
+/** Cualquier campo de texto enriquecido que devuelvan las queries. */
+export type BlockValue = ReadonlyArray<{ _type: string; _key: string }>;
 
 const components: PortableTextComponents = {
   block: {
@@ -48,19 +49,15 @@ const components: PortableTextComponents = {
   },
 };
 
-export function RichText({
-  value,
-}: {
-  value: RichTextValue | null | undefined;
-}) {
+export function RichText({ value }: { value: BlockValue | null | undefined }) {
   if (!value?.length) return null;
   return <PortableText value={toBlocks(value)} components={components} />;
 }
 
 /**
- * El tipo que genera TypeGen marca `children` como opcional y el de
+ * Los tipos que genera TypeGen marcan `children` como opcional y el de
  * PortableText lo exige; en la práctica Sanity siempre lo guarda.
  */
-export function toBlocks(value: RichTextValue) {
-  return value as PortableTextBlock[];
+export function toBlocks(value: BlockValue) {
+  return value as unknown as PortableTextBlock[];
 }

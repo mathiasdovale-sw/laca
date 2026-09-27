@@ -18,10 +18,12 @@ export const settingsQuery = defineQuery(`
     email,
     phone,
     address,
+    location,
     mapsUrl,
     instagram,
     linkedin,
-    facebook
+    contactTitle,
+    contactText
   }
 `);
 
@@ -30,16 +32,24 @@ export const contactSettingsQuery = defineQuery(`
   *[_type == "settings" && _id == "settings"][0] { siteTitle, contactFormRecipient }
 `);
 
+// Datos de un proyecto para tarjetas y carrusel.
+const projectCard = /* groq */ `{
+  _id,
+  title,
+  "slug": slug.current,
+  coverImage ${image},
+  location,
+  year
+}`;
+
 export const homeQuery = defineQuery(`
   *[_type == "home" && _id == "home"][0] {
+    heroProjects[]-> ${projectCard},
     intro,
-    featuredProjects[]-> {
-      _id,
-      title,
-      "slug": slug.current,
-      coverImage ${image},
-      "category": category->title
-    },
+    featuredProjects[]-> ${projectCard},
+    studioHeading,
+    studioText,
+    studioImage ${image},
     ${seo}
   }
 `);
@@ -50,7 +60,6 @@ export const projectsQuery = defineQuery(`
     title,
     "slug": slug.current,
     coverImage ${image},
-    "category": category->title,
     location,
     year
   }

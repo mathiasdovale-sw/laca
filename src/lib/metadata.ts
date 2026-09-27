@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { toPlainText } from "next-sanity";
 
-import { toBlocks } from "@/components/RichText";
+import { toBlocks, type BlockValue } from "@/components/RichText";
 import type { SanityImageValue } from "@/components/SanityImage";
 import { fallbackSiteTitle } from "@/lib/site";
 import { urlFor } from "@/sanity/lib/image";
-import type { RichText } from "@/sanity/types";
 
 type Seo = {
   title?: string | null;
@@ -26,7 +25,7 @@ export function buildMetadata({
 }: {
   seo?: Seo;
   title?: string | null;
-  description?: string | RichText | null;
+  description?: string | BlockValue | null;
   image?: SanityImageValue | null;
   path: string;
 }): Metadata {
@@ -65,7 +64,7 @@ export function buildMetadata({
   };
 }
 
-function toDescription(value: string | RichText | null | undefined) {
+function toDescription(value: string | BlockValue | null | undefined) {
   if (!value) return undefined;
   const text = typeof value === "string" ? value : toPlainText(toBlocks(value));
   const clean = text.replace(/\s+/g, " ").trim();

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/Container";
 import { RichText } from "@/components/RichText";
 import { SanityImage } from "@/components/SanityImage";
+import { Label } from "@/components/ui";
 import { buildMetadata } from "@/lib/metadata";
 import { client } from "@/sanity/lib/client";
 import { sanityFetch } from "@/sanity/lib/fetch";
@@ -59,14 +60,16 @@ export default async function ProjectPage({
 
   return (
     <article>
-      <Container className="py-12">
-        <h1 className="text-2xl font-semibold">{project.title}</h1>
+      <Container className="pt-10 pb-20 md:pt-16 md:pb-28">
+        <h1 className="text-4xl tracking-tight md:text-5xl">{project.title}</h1>
 
         {facts.length > 0 && (
-          <dl className="mt-6 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+          <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-border pt-6 sm:grid-cols-4">
             {facts.map((fact) => (
               <div key={fact.label}>
-                <dt className="text-muted">{fact.label}</dt>
+                <Label as="dt" className="mb-1 text-muted">
+                  {fact.label}
+                </Label>
                 <dd>{fact.value}</dd>
               </div>
             ))}
@@ -75,17 +78,17 @@ export default async function ProjectPage({
 
         <SanityImage
           image={project.coverImage}
-          sizes="(min-width: 1152px) 1152px, 100vw"
+          sizes="100vw"
           preload
-          className="mt-8 h-auto w-full"
+          className="mt-10 h-auto w-full"
         />
 
-        <div className="mt-10 max-w-2xl">
+        <div className="mt-12 max-w-3xl text-lg leading-relaxed md:mt-16">
           <RichText value={project.description} />
         </div>
 
         {project.gallery && project.gallery.length > 0 && (
-          <div className="mt-12 grid gap-4 sm:grid-cols-2">
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 md:mt-16 md:gap-10">
             {project.gallery.map((image) => (
               <SanityImage
                 key={image._key}

@@ -8,10 +8,12 @@ import type {
   ContactFormState,
 } from "@/app/(site)/contacto/schema";
 
+import { PillButton } from "./ui";
+
 const initialState: ContactFormState = { status: "idle" };
 
 const fields: {
-  name: ContactField;
+  name: Exclude<ContactField, "message">;
   label: string;
   type?: string;
   required?: boolean;
@@ -25,17 +27,14 @@ const fields: {
     required: true,
     autoComplete: "email",
   },
-  {
-    name: "phone",
-    label: "Teléfono (opcional)",
-    type: "tel",
-    autoComplete: "tel",
-  },
-  { name: "subject", label: "Asunto", required: true },
+  { name: "phone", label: "Teléfono", type: "tel", autoComplete: "tel" },
+  { name: "projectLocation", label: "Ubicación del proyecto" },
 ];
 
+// Campos con línea inferior y el texto de ayuda como placeholder; la
+// etiqueta queda disponible para lectores de pantalla.
 const inputClass =
-  "border-border w-full border px-3 py-2 focus:border-neutral-500 focus:outline-none";
+  "w-full border-b border-white/40 bg-transparent py-3 text-base text-white placeholder:text-white/50 focus:border-white focus:outline-none aria-[invalid=true]:border-red-400";
 
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(
@@ -50,48 +49,59 @@ export function ContactForm() {
   }, [state]);
 
   if (state.status === "success") {
-    return <p role="status">{state.message}</p>;
+    return (
+      <p role="status" className="text-lg">
+        {state.message}
+      </p>
+    );
   }
 
   return (
-    <form action={formAction} className="max-w-xl space-y-5" noValidate>
-      {fields.map((field) => (
-        <div key={field.name}>
-          <label htmlFor={field.name} className="mb-1 block text-sm">
-            {field.label}
-          </label>
-          <input
-            id={field.name}
-            name={field.name}
-            type={field.type ?? "text"}
-            required={field.required}
-            autoComplete={field.autoComplete}
-            defaultValue={state.values?.[field.name]}
-            aria-invalid={Boolean(state.errors?.[field.name])}
-            aria-describedby={
-              state.errors?.[field.name] ? `${field.name}-error` : undefined
-            }
-            className={inputClass}
-          />
-          <FieldError name={field.name} errors={state.errors?.[field.name]} />
-        </div>
-      ))}
+    <form action={formAction} noValidate>
+      <div className="grid gap-x-6 gap-y-6 sm:grid-cols-2">
+        {fields.map((field) => (
+          <div key={field.name}>
+            <label htmlFor={field.name} className="sr-only">
+              {field.label}
+              {field.required ? "" : " (opcional)"}
+            </label>
+            <input
+              id={field.name}
+              name={field.name}
+              type={field.type ?? "text"}
+              placeholder={field.label}
+              required={field.required}
+              autoComplete={field.autoComplete}
+              defaultValue={state.values?.[field.name]}
+              aria-invalid={Boolean(state.errors?.[field.name])}
+              aria-describedby={
+                state.errors?.[field.name] ? `${field.name}-error` : undefined
+              }
+              className={inputClass}
+            />
+            <FieldError name={field.name} errors={state.errors?.[field.name]} />
+          </div>
+        ))}
 
-      <div>
-        <label htmlFor="message" className="mb-1 block text-sm">
-          Mensaje
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          rows={6}
-          required
-          defaultValue={state.values?.message}
-          aria-invalid={Boolean(state.errors?.message)}
-          aria-describedby={state.errors?.message ? "message-error" : undefined}
-          className={inputClass}
-        />
-        <FieldError name="message" errors={state.errors?.message} />
+        <div className="sm:col-span-2">
+          <label htmlFor="message" className="sr-only">
+            Contanos sobre tu proyecto
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            rows={6}
+            placeholder="Contanos sobre tu proyecto"
+            required
+            defaultValue={state.values?.message}
+            aria-invalid={Boolean(state.errors?.message)}
+            aria-describedby={
+              state.errors?.message ? "message-error" : undefined
+            }
+            className={`${inputClass} resize-none`}
+          />
+          <FieldError name="message" errors={state.errors?.message} />
+        </div>
       </div>
 
       {/* Honeypot: oculto para personas, los bots lo completan. */}
@@ -109,18 +119,19 @@ export function ContactForm() {
       <input type="hidden" name="token" value={token} />
 
       {state.status === "error" && state.message && (
-        <p role="alert" className="text-sm text-red-700">
+        <p role="alert" className="mt-6 text-sm text-red-300">
           {state.message}
         </p>
       )}
 
-      <button
+      <PillButton
         type="submit"
+        variant="light"
         disabled={pending || !token}
-        className="bg-foreground px-5 py-2 text-white disabled:opacity-50"
+        className="mt-10"
       >
         {pending ? "Enviando…" : "Enviar"}
-      </button>
+      </PillButton>
     </form>
   );
 }
@@ -128,7 +139,7 @@ export function ContactForm() {
 function FieldError({ name, errors }: { name: string; errors?: string[] }) {
   if (!errors?.length) return null;
   return (
-    <p id={`${name}-error`} className="mt-1 text-sm text-red-700">
+    <p id={`${name}-error`} className="mt-2 text-sm text-red-300">
       {errors[0]}
     </p>
   );

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/Container";
 import { RichText } from "@/components/RichText";
 import { SanityImage } from "@/components/SanityImage";
+import { Label } from "@/components/ui";
 import { buildMetadata } from "@/lib/metadata";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { studioQuery } from "@/sanity/lib/queries";
@@ -25,24 +26,27 @@ export default async function StudioPage() {
   const studio = await getStudio();
 
   return (
-    <Container className="py-12">
-      <h1 className="mb-8 text-2xl font-semibold">
+    <Container className="pt-10 pb-20 md:pt-16 md:pb-28">
+      <h1 className="mb-12 text-4xl tracking-tight md:mb-16 md:text-5xl">
         {studio?.title ?? "Estudio"}
       </h1>
 
-      <div className="max-w-2xl">
+      <div className="max-w-3xl text-lg leading-relaxed">
         <RichText value={studio?.body} />
       </div>
 
       {studio?.team && studio.team.length > 0 && (
-        <section className="mt-16">
-          <h2 className="mb-6 text-sm tracking-wide text-muted uppercase">
-            Equipo
-          </h2>
-          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <section
+          aria-labelledby="team-title"
+          className="mt-20 border-t border-border pt-6 md:mt-28"
+        >
+          <Label as="h2" id="team-title" className="mb-10 text-muted">
+            (Equipo)
+          </Label>
+          <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 md:gap-x-10 lg:grid-cols-4">
             {studio.team.map((member) => (
               <li key={member._key}>
-                <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
+                <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
                   <SanityImage
                     image={member.photo}
                     fill
@@ -50,9 +54,9 @@ export default async function StudioPage() {
                     className="object-cover"
                   />
                 </div>
-                <p className="mt-3 font-medium">{member.name}</p>
+                <p className="mt-4 text-base">{member.name}</p>
                 {member.role && (
-                  <p className="text-sm text-muted">{member.role}</p>
+                  <Label className="mt-1 text-muted">{member.role}</Label>
                 )}
               </li>
             ))}

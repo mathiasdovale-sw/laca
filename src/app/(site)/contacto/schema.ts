@@ -22,15 +22,10 @@ export const contactSchema = z.object({
       /^[\d\s+()-]*$/,
       "El teléfono solo puede tener números, espacios y + ( ) -.",
     ),
-  subject: z
+  projectLocation: z
     .string()
     .transform(singleLine)
-    .pipe(
-      z
-        .string()
-        .min(2, "Ingresá un asunto.")
-        .max(150, "El asunto es demasiado largo."),
-    ),
+    .pipe(z.string().max(150, "La ubicación es demasiado larga.")),
   message: z
     .string()
     .trim()

@@ -1,6 +1,6 @@
 # Estudio LACA — sitio web
 
-Sitio institucional del estudio. El front es un **template neutro** (tipografía del sistema, grises) pensado para rediseñarse.
+Sitio institucional del estudio. Tipografía **Inter Tight** (Google Fonts, servida desde el propio dominio con `next/font`), paleta en blanco, negro y grises.
 
 - **Next.js 16** (App Router, TypeScript) + **Tailwind CSS 4**
 - **Sanity 6** como CMS, con el Studio embebido en `/studio` (vía `next-sanity`)
@@ -84,13 +84,13 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 Se entra en `/studio` (en producción: `https://estudiolaca.com/studio`) con una cuenta de Sanity invitada al proyecto. La interfaz está en español.
 
-| Sección           | Qué es                                                                                                |
-| ----------------- | ----------------------------------------------------------------------------------------------------- |
-| **Inicio**        | Documento único: texto de presentación y proyectos destacados.                                        |
-| **Proyectos**     | Lista ordenable arrastrando. El orden se usa en `/proyectos`.                                         |
-| **Categorías**    | Tipologías que se asignan a los proyectos (se pueden crear, renombrar y borrar si no están en uso).   |
-| **Estudio**       | Documento único: texto e integrantes del equipo.                                                      |
-| **Configuración** | Documento único: nombre del sitio, contacto, redes y el email que recibe los mensajes del formulario. |
+| Sección           | Qué es                                                                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Inicio**        | Documento único: proyectos del carrusel, texto de presentación, proyectos destacados y bloque Estudio.                                      |
+| **Proyectos**     | Lista ordenable arrastrando. El orden se usa en `/proyectos`.                                                                               |
+| **Categorías**    | Tipologías que se asignan a los proyectos (se pueden crear, renombrar y borrar si no están en uso).                                         |
+| **Estudio**       | Documento único: texto e integrantes del equipo.                                                                                            |
+| **Configuración** | Documento único: nombre del sitio, contacto, redes (Instagram, LinkedIn), textos del bloque de contacto y el email que recibe los mensajes. |
 
 Todas las imágenes piden **texto alternativo obligatorio**. Cada documento tiene un bloque **SEO** opcional; si queda vacío se usan el título, el texto y la imagen principal.
 
@@ -160,7 +160,8 @@ En local pasa lo mismo: si ves datos viejos, borrá la carpeta `.next/cache` y v
 
 El formulario (`/contacto`) envía con un **server action**: no expone un endpoint propio y valida todo del lado del servidor con zod.
 
-- **Campos:** nombre, email, teléfono (opcional), asunto y mensaje.
+- **Campos:** nombre, email, teléfono (opcional), ubicación del proyecto (opcional) y mensaje.
+- **Dónde:** es el bloque negro que aparece al final de todas las páginas (`src/components/ContactSection.tsx`). `/contacto` muestra solo ese bloque.
 - **Destinatario:** el email configurado en _Configuración → Formulario_.
 - **Remitente:** `SMTP_USER`.
 - **Responder:** "Responder" contesta directo a quien escribió (`Reply-To`).
@@ -276,7 +277,9 @@ Cada push a `main` genera un deploy nuevo. El contenido **no** depende de los de
       └─ schemaTypes/        Esquemas: documents/ y objects/
 ```
 
-**Para rediseñar**: los colores base están en `src/app/globals.css` (`@theme`), el layout general en `src/app/(site)/layout.tsx` y los componentes en `src/components/`.
+**Diseño**: colores y tipografía en `src/app/globals.css` (`@theme`) y `src/lib/fonts.ts`; estructura común (header, bloque de contacto, footer) en `src/components/SiteShell.tsx`; piezas reutilizables (etiquetas, botones con flecha) en `src/components/ui.tsx`; el logo en `src/components/Logo.tsx`.
+
+Los links legales del footer (`/cookies`, `/privacidad`) están preparados pero esas páginas todavía no existen (dan 404).
 
 ## Notas de versiones
 

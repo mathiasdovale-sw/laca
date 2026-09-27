@@ -1,8 +1,11 @@
-import { fallbackSiteTitle } from "@/lib/site";
+import Link from "next/link";
+
+import { fallbackSiteTitle, legalLinks, navigation } from "@/lib/site";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { settingsQuery } from "@/sanity/lib/queries";
 
 import { Container } from "./Container";
+import { Label } from "./ui";
 
 export async function Footer() {
   const settings = await sanityFetch({
@@ -11,75 +14,102 @@ export async function Footer() {
   });
 
   const socials = [
-    { label: "Instagram", href: settings?.instagram },
-    { label: "LinkedIn", href: settings?.linkedin },
-    { label: "Facebook", href: settings?.facebook },
+    { label: "instagram", href: settings?.instagram },
+    { label: "linkedin", href: settings?.linkedin },
   ].filter((social): social is { label: string; href: string } =>
     Boolean(social.href),
   );
 
   return (
-    <footer className="mt-24 border-t border-border text-sm text-muted">
-      <Container className="grid gap-8 py-10 sm:grid-cols-3">
-        <div>
-          <p className="font-semibold text-foreground">
-            {settings?.siteTitle ?? fallbackSiteTitle}
-          </p>
-          {settings?.address && (
-            <p className="mt-2 whitespace-pre-line">
-              {settings.mapsUrl ? (
-                <a
-                  href={settings.mapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {settings.address}
-                </a>
-              ) : (
-                settings.address
-              )}
-            </p>
-          )}
-        </div>
-
-        <ul className="space-y-1">
-          {settings?.email && (
-            <li>
-              <a href={`mailto:${settings.email}`} className="hover:underline">
-                {settings.email}
-              </a>
-            </li>
-          )}
-          {settings?.phone && (
-            <li>
-              <a
-                href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}
-                className="hover:underline"
-              >
-                {settings.phone}
-              </a>
-            </li>
-          )}
-        </ul>
-
-        {socials.length > 0 && (
-          <ul className="space-y-1">
-            {socials.map((social) => (
-              <li key={social.label}>
-                <a
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {social.label}
+    <footer className="pt-16 text-sm">
+      <Container>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
+          <FooterColumn title="Contacto">
+            {settings?.phone && (
+              <li>
+                <a href={`tel:${settings.phone.replace(/[^\d+]/g, "")}`}>
+                  {settings.phone}
                 </a>
               </li>
+            )}
+            {settings?.email && (
+              <li>
+                <a href={`mailto:${settings.email}`}>{settings.email}</a>
+              </li>
+            )}
+            {settings?.location && <li>{settings.location}</li>}
+          </FooterColumn>
+
+          <FooterColumn title="Navegación">
+            {navigation.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="lowercase">
+                  {item.label}
+                </Link>
+              </li>
             ))}
-          </ul>
-        )}
+          </FooterColumn>
+
+          {socials.length > 0 && (
+            <FooterColumn title="Redes">
+              {socials.map((social) => (
+                <li key={social.label}>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {social.label}
+                  </a>
+                </li>
+              ))}
+            </FooterColumn>
+          )}
+
+          <FooterColumn title="Legal">
+            {legalLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href}>{item.label}</Link>
+              </li>
+            ))}
+          </FooterColumn>
+        </div>
+
+        <p
+          aria-hidden="true"
+          className="mt-20 text-right text-[17vw] leading-[0.85] font-medium tracking-tighter md:text-[13vw]"
+        >
+          {fallbackSiteTitle}
+        </p>
+
+        <div className="mt-10 flex items-center justify-between border-t border-border py-6">
+          <p className="text-[0.6875rem] tracking-[0.15em] text-muted">
+            © {new Date().getFullYear()} {fallbackSiteTitle}
+          </p>
+          <a href="#top" className="text-muted hover:text-foreground">
+            <Label as="span">
+              Volver arriba <span aria-hidden="true">↑</span>
+            </Label>
+          </a>
+        </div>
       </Container>
     </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <Label as="h2" className="mb-4 text-muted">
+        {title}
+      </Label>
+      <ul className="space-y-1 [&_a]:hover:underline">{children}</ul>
+    </div>
   );
 }

@@ -27,7 +27,7 @@ export async function sendContactForm(
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
     phone: String(formData.get("phone") ?? ""),
-    subject: String(formData.get("subject") ?? ""),
+    projectLocation: String(formData.get("projectLocation") ?? ""),
     message: String(formData.get("message") ?? ""),
   } satisfies Record<ContactField, string>;
 
@@ -56,7 +56,7 @@ export async function sendContactForm(
     };
   }
 
-  const { name, email, phone, subject, message } = parsed.data;
+  const { name, email, phone, projectLocation, message } = parsed.data;
 
   try {
     const settings = await sanityFetch({
@@ -69,13 +69,13 @@ export async function sendContactForm(
     await sendMail({
       to,
       replyTo: { name, address: email },
-      subject: `Consulta web: ${subject}`,
+      subject: `Consulta web de ${name}`,
       fromName: `Web ${settings?.siteTitle ?? fallbackSiteTitle}`,
       text: [
         `Nombre: ${name}`,
         `Email: ${email}`,
         `Teléfono: ${phone || "-"}`,
-        `Asunto: ${subject}`,
+        `Ubicación del proyecto: ${projectLocation || "-"}`,
         "",
         message,
       ].join("\n"),
