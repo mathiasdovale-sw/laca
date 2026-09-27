@@ -54,6 +54,10 @@ npm run seed
 
 Carga 2 categorías, 3 proyectos con imágenes placeholder, la página Estudio, Inicio y Configuración con datos de contacto inventados. Se puede volver a correr: reemplaza los mismos documentos sin duplicarlos. **Ojo**: si ya editaste esos documentos en el Studio, los sobrescribe.
 
+El script escribe directo en el dataset (no pasa por el webhook): si ya habías levantado el sitio antes, borrá `.next/cache` para verlo.
+
+> Ya se corrió una vez en `production` (27/09/2026). No hace falta repetirlo.
+
 ## Variables de entorno
 
 Están todas documentadas en [.env.example](.env.example). En local van en `.env.local` (no se sube a git); en Vercel, en _Project Settings → Environment Variables_.
@@ -140,7 +144,17 @@ Las páginas se generan en el build y quedan cacheadas **sin vencimiento**. Cuan
 
 3. Guardar. Para probarlo: publicá un cambio y mirá la pestaña **Attempts log** del webhook (tiene que responder `200`).
 
-El webhook tiene que apuntar al dominio de producción ya deployado; en local no se puede recibir (para ver cambios en local alcanza con recargar `npm run dev`).
+El webhook tiene que apuntar al dominio de producción ya deployado; en local no se puede recibir.
+
+### Si un cambio no aparece en el sitio
+
+La caché de datos **no se borra con un build ni con un deploy nuevo** (Vercel la conserva entre deploys a propósito). Si un cambio publicado no aparece:
+
+1. Revisá el **Attempts log** del webhook en Sanity: tiene que haber un intento con respuesta `200`. Un `401` significa que el secret no coincide con `SANITY_REVALIDATE_SECRET`.
+2. Volvé a publicar el documento (cualquier cambio mínimo): dispara el webhook de nuevo.
+3. Último recurso, en Vercel: proyecto → **CDN** → **Caches** → _Purge cache_ → **All content** → capa **Runtime and Data Cache** → _Purge_. Ojo: en Hobby y Pro la caché es compartida por todos los proyectos del equipo en ese entorno.
+
+En local pasa lo mismo: si ves datos viejos, borrá la carpeta `.next/cache` y volvé a correr `npm run dev` o `npm run build`.
 
 ## Formulario de contacto (SMTP)
 
@@ -196,6 +210,9 @@ El plan **Hobby** incluye **5.000 transformaciones por mes**. Cada combinación 
 
 - Hay pocos anchos definidos (`deviceSizes: [640, 1080, 1920, 2560]`, `imageSizes: [384]`), un solo formato (WebP) y una sola calidad (75).
 - Las imágenes para compartir en redes (Open Graph) salen directo del CDN de Sanity y no cuentan.
+- `remotePatterns` solo acepta imágenes de este proyecto de Sanity y con exactamente `?w=2560&fit=max`. Así nadie puede pedir variantes arbitrarias de una imagen para agotar el cupo.
+
+**Recorte y punto de interés:** por la restricción anterior, el **recorte** (crop) que se haga en el Studio **no se aplica**. El **punto de interés** (hotspot) sí: define qué parte de la imagen queda visible en las miniaturas (`object-position`). Si en el futuro se quiere el recorte, hay que permitir cualquier parámetro en `remotePatterns` (quitando `search`), asumiendo el riesgo de abuso del cupo.
 
 Si se supera el límite, las imágenes **nuevas** dejan de optimizarse (las ya cacheadas siguen funcionando) hasta el mes siguiente. Se puede ver el consumo en Vercel → **Usage** → _Image Optimization_.
 
@@ -212,7 +229,7 @@ Si se supera el límite, las imágenes **nuevas** dejan de optimizarse (las ya c
 5. En Sanity: agregar `https://estudiolaca.com` a **CORS** (ver [CORS](#cors)) y crear el **webhook** (ver [Webhook](#webhook-de-revalidación)).
 6. Probar: publicar un cambio en `/studio` y ver que se refleje en el sitio, y enviar un mensaje de prueba desde `/contacto`.
 
-Cada push a `main` genera un deploy nuevo (y un build nuevo con el contenido actual de Sanity).
+Cada push a `main` genera un deploy nuevo. El contenido **no** depende de los deploys: se actualiza con el webhook (ver [Si un cambio no aparece](#si-un-cambio-no-aparece-en-el-sitio)).
 
 ## Scripts
 

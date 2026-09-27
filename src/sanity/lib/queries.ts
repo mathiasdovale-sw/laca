@@ -1,9 +1,11 @@
 import { defineQuery } from "next-sanity";
 
-// Proyección reutilizable para imágenes: mantiene alt, crop y hotspot, y trae
-// las dimensiones originales para que next/image reserve el espacio correcto.
+// Proyección reutilizable para imágenes: alt, hotspot y las dimensiones
+// originales para que next/image reserve el espacio correcto.
 const image = /* groq */ `{
-  ...,
+  _key,
+  alt,
+  hotspot { x, y },
   asset->{ _id, metadata { dimensions { width, height } } }
 }`;
 

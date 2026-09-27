@@ -8,7 +8,18 @@ const nextConfig: NextConfig = {
     // Plan Hobby: 5.000 transformaciones/mes. Cada combinación de
     // imagen × ancho × formato × calidad cuenta como una, así que se limitan
     // los anchos, se usa un solo formato y una sola calidad.
-    remotePatterns: [new URL(`https://cdn.sanity.io/images/${projectId}/**`)],
+    // Solo imágenes de este proyecto y con exactamente estos parámetros
+    // (ver src/components/SanityImage.tsx): evita que se pidan variantes
+    // arbitrarias que consuman transformaciones.
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        port: "",
+        pathname: `/images/${projectId}/**`,
+        search: "?w=2560&fit=max",
+      },
+    ],
     formats: ["image/webp"],
     qualities: [75],
     deviceSizes: [640, 1080, 1920, 2560],
