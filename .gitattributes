@@ -1,0 +1,4 @@
+# Fin de línea LF en el repo y en el disco (coincide con Prettier).
+* text=auto eol=lf
+*.png binary
+*.ico binary
