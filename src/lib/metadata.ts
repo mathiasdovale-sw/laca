@@ -35,17 +35,19 @@ export function buildMetadata({
     seo?.description || toDescription(description) || undefined;
   const ogImage = seo?.image?.asset ? seo.image : image?.asset ? image : null;
 
+  // Las claves vacías se omiten: un `title: undefined` explícito pisaría el
+  // título por defecto del layout.
   return {
-    title: finalTitle,
-    description: finalDescription,
+    ...(finalTitle && { title: finalTitle }),
+    ...(finalDescription && { description: finalDescription }),
     alternates: { canonical: path },
     // openGraph reemplaza entero al del layout: se repiten locale y type.
     openGraph: {
       locale: "es_AR",
       type: "website",
       siteName: fallbackSiteTitle,
-      title: finalTitle,
-      description: finalDescription,
+      ...(finalTitle && { title: finalTitle }),
+      ...(finalDescription && { description: finalDescription }),
       url: path,
       images: ogImage
         ? [
