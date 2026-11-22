@@ -32,6 +32,7 @@ export async function ContactSection() {
   return (
     <section
       id="contacto"
+      data-header-dark
       aria-labelledby="contact-title"
       className="bg-foreground py-16 text-white md:py-24"
     >

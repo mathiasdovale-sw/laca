@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { fallbackSiteTitle, legalLinks, navigation } from "@/lib/site";
+import { fallbackSiteTitle, navigation } from "@/lib/site";
 import { sanityFetch } from "@/sanity/lib/fetch";
-import { settingsQuery } from "@/sanity/lib/queries";
+import { legalLinksQuery, settingsQuery } from "@/sanity/lib/queries";
 
 import { Container } from "./Container";
 import { Label } from "./ui";
@@ -11,6 +11,10 @@ export async function Footer() {
   const settings = await sanityFetch({
     query: settingsQuery,
     tags: ["settings"],
+  });
+  const legalLinks = await sanityFetch({
+    query: legalLinksQuery,
+    tags: ["legalPage"],
   });
 
   const socials = [
@@ -66,13 +70,15 @@ export async function Footer() {
             </FooterColumn>
           )}
 
-          <FooterColumn title="Legal">
-            {legalLinks.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </li>
-            ))}
-          </FooterColumn>
+          {legalLinks.length > 0 && (
+            <FooterColumn title="Legal">
+              {legalLinks.map((item) => (
+                <li key={item._id}>
+                  <Link href={`/legales/${item.slug}`}>{item.label}</Link>
+                </li>
+              ))}
+            </FooterColumn>
+          )}
         </div>
 
         <p

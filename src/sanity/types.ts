@@ -113,6 +113,27 @@ export type Studio = {
   seo?: Seo;
 };
 
+export type LegalPage = {
+  _id: string;
+  _type: "legalPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderRank?: string;
+  title: string;
+  slug: Slug;
+  footerLabel?: string;
+  updatedAt?: string;
+  body: RichText;
+  seo?: Seo;
+};
+
+export type Slug = {
+  _type: "slug";
+  current: string;
+  source?: string;
+};
+
 export type Project = {
   _id: string;
   _type: "project";
@@ -135,12 +156,6 @@ export type Project = {
     } & ImageWithAlt
   >;
   seo?: Seo;
-};
-
-export type Slug = {
-  _type: "slug";
-  current: string;
-  source?: string;
 };
 
 export type ProjectReference = {
@@ -308,8 +323,9 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Settings
   | Studio
-  | Project
+  | LegalPage
   | Slug
+  | Project
   | ProjectReference
   | Home
   | SanityImageCrop
@@ -633,6 +649,58 @@ export type StudioQueryResult = {
 } | null;
 
 // Source: src/sanity/lib/queries.ts
+// Variable: legalLinksQuery
+// Query: *[_type == "legalPage" && defined(slug.current)] | order(orderRank) {    _id,    "label": coalesce(footerLabel, title),    "slug": slug.current  }
+export type LegalLinksQueryResult = Array<{
+  _id: string;
+  label: string;
+  slug: string;
+}>;
+
+// Source: src/sanity/lib/queries.ts
+// Variable: legalPageQuery
+// Query: *[_type == "legalPage" && slug.current == $slug][0] {    title,    updatedAt,    body,    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
+export type LegalPageQueryResult = {
+  title: string;
+  updatedAt: string | null;
+  body: RichText;
+  seo: {
+    title: string | null;
+    description: string | null;
+    image: {
+      _key: null;
+      alt: string;
+      hotspot: {
+        x: number;
+        y: number;
+      } | null;
+      asset: {
+        _id: string;
+        metadata: {
+          dimensions: {
+            width: number;
+            height: number;
+          } | null;
+        } | null;
+      } | null;
+    } | null;
+  } | null;
+} | null;
+
+// Source: src/sanity/lib/queries.ts
+// Variable: legalSlugsQuery
+// Query: *[_type == "legalPage" && defined(slug.current)].slug.current
+export type LegalSlugsQueryResult = Array<string>;
+
+// Source: src/sanity/lib/queries.ts
+// Variable: legalSitemapQuery
+// Query: *[_type == "legalPage" && defined(slug.current)] {    "slug": slug.current,    _updatedAt  }
+export type LegalSitemapQueryResult = Array<{
+  slug: string;
+  _updatedAt: string;
+}>;
+
+// Source: src/sanity/lib/queries.ts
 // Variable: sitemapQuery
 // Query: *[_type == "project" && defined(slug.current)] {    "slug": slug.current,    _updatedAt  }
 export type SitemapQueryResult = Array<{
@@ -650,6 +718,10 @@ declare global {
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    "slug": slug.current,\n    coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    "bannerImage": coalesce(bannerImage, coverImage) {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    status,\n    location,\n    year,\n    area,\n    description,\n    gallery[] {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': ProjectQueryResult;
     '\n  *[_type == "project" && defined(slug.current)].slug.current\n': ProjectSlugsQueryResult;
     '\n  *[_type == "studio" && _id == "studio"][0] {\n    title,\n    body,\n    team[] { _key, name, role, bio, photo {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} },\n    processTitle,\n    process[] { _key, title, text },\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': StudioQueryResult;
+    '\n  *[_type == "legalPage" && defined(slug.current)] | order(orderRank) {\n    _id,\n    "label": coalesce(footerLabel, title),\n    "slug": slug.current\n  }\n': LegalLinksQueryResult;
+    '\n  *[_type == "legalPage" && slug.current == $slug][0] {\n    title,\n    updatedAt,\n    body,\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': LegalPageQueryResult;
+    '\n  *[_type == "legalPage" && defined(slug.current)].slug.current\n': LegalSlugsQueryResult;
+    '\n  *[_type == "legalPage" && defined(slug.current)] {\n    "slug": slug.current,\n    _updatedAt\n  }\n': LegalSitemapQueryResult;
     '\n  *[_type == "project" && defined(slug.current)] {\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapQueryResult;
   }
 }

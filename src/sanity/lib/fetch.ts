@@ -6,7 +6,7 @@ import { client } from "./client";
  * Tags de caché. Cada uno coincide con el `_type` de un documento de Sanity:
  * el webhook de /api/revalidate llama a revalidateTag(_type) al publicar.
  */
-export type CacheTag = "home" | "project" | "studio" | "settings";
+export type CacheTag = "home" | "project" | "studio" | "settings" | "legalPage";
 
 /**
  * Consulta a Sanity cacheada en forma permanente (sin revalidación por tiempo).

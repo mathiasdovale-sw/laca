@@ -12,10 +12,11 @@ import { Logo } from "./Logo";
 /**
  * Header fijo arriba en todas las páginas.
  *
- * En el inicio arranca transparente con texto blanco, encima del carrusel; en
- * cuanto se hace scroll (y en el resto de las páginas siempre) pasa a fondo
- * blanco con texto negro, así se lee sobre cualquier foto o sobre el bloque
- * negro de contacto. Al bajar se achica un poco.
+ * No tiene un fondo sólido ni un borde: es un degradé que va de arriba hacia
+ * abajo hasta quedar transparente, así se funde con lo que pasa por debajo.
+ * Sobre secciones oscuras (las marcadas con `data-header-dark`: el carrusel y
+ * el bloque de contacto) el degradé es negro y el texto blanco; sobre el resto,
+ * el degradé es blanco y el texto negro. Al hacer scroll se achica un poco.
  *
  * En pantallas chicas los links se muestran con el botón hamburguesa: las dos
  * líneas se cruzan en una X, el panel aparece con un fundido y los links
@@ -23,11 +24,11 @@ import { Logo } from "./Logo";
  */
 export function Header() {
   const pathname = usePathname();
-  const overlay = pathname === "/";
+  const fixed = pathname === "/";
   const [open, setOpen] = useState(false);
-  const scrolled = useScrolled();
+  const { scrolled, overDark } = useHeaderState(pathname);
 
-  const solid = !overlay || scrolled || open;
+  const dark = overDark && !open;
 
   // Cerrar con Escape y bloquear el scroll de fondo mientras está abierto.
   useEffect(() => {
@@ -45,10 +46,26 @@ export function Header() {
 
   return (
     <header
-      className={`${overlay ? "fixed" : "sticky"} inset-x-0 top-0 z-40 border-b transition-colors duration-300 ${
-        solid ? "bg-background text-foreground" : "bg-transparent text-white"
-      } ${scrolled && !open ? "border-border" : "border-transparent"}`}
+      className={`${fixed ? "fixed" : "sticky"} inset-x-0 top-0 z-40 transition-colors duration-500 ${
+        dark ? "text-white" : "text-foreground"
+      }`}
     >
+      {/* Degradés de fondo: se cruzan con un fundido (un background-image no
+          se puede animar). Se extienden un poco por debajo de la barra para
+          que el texto quede sobre la parte más opaca. */}
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+1.5rem)] bg-[linear-gradient(to_bottom,rgb(0_0_0/0.5),rgb(0_0_0/0.25)_55%,transparent)] transition-opacity duration-500 ${
+          dark ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      <div
+        aria-hidden="true"
+        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+1.5rem)] bg-[linear-gradient(to_bottom,rgb(255_255_255/0.92),rgb(255_255_255/0.7)_50%,transparent)] transition-opacity duration-500 ${
+          dark || open ? "opacity-0" : "opacity-100"
+        }`}
+      />
+
       <Container
         className={`relative z-50 flex items-center justify-between transition-[padding] duration-300 ${
           scrolled ? "py-4" : "py-6"
@@ -130,14 +147,49 @@ export function Header() {
   );
 }
 
-/** `true` en cuanto la página se desplazó unos píxeles hacia abajo. */
-function useScrolled() {
-  const [scrolled, setScrolled] = useState(false);
+/** Altura (px) a la que se mira qué sección pasa por debajo del header. */
+const PROBE_Y = 36;
+
+/**
+ * `scrolled`: la página se desplazó unos píxeles.
+ * `overDark`: el header está encima de una sección marcada con
+ * `data-header-dark` (el carrusel del inicio o el bloque negro de contacto).
+ * En el inicio arranca en `true` para que el primer render ya sea el correcto.
+ */
+function useHeaderState(pathname: string) {
+  const [state, setState] = useState({
+    scrolled: false,
+    overDark: pathname === "/",
+  });
+
   useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
+    let frame = 0;
+    const update = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const overDark = Array.from(
+          document.querySelectorAll("[data-header-dark]"),
+        ).some((element) => {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= PROBE_Y && rect.bottom >= PROBE_Y;
+        });
+        const scrolled = window.scrollY > 8;
+        setState((current) =>
+          current.overDark === overDark && current.scrolled === scrolled
+            ? current
+            : { overDark, scrolled },
+        );
+      });
+    };
     update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+    window.addEventListener("resize", update);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [pathname]);
+
+  return state;
 }

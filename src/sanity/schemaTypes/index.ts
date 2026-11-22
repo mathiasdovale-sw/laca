@@ -1,4 +1,5 @@
 import { home } from "./documents/home";
+import { legalPage } from "./documents/legalPage";
 import { project } from "./documents/project";
 import { settings } from "./documents/settings";
 import { studio } from "./documents/studio";
@@ -12,6 +13,7 @@ export const schemaTypes = [
   // Documentos
   home,
   project,
+  legalPage,
   studio,
   settings,
   // Objetos

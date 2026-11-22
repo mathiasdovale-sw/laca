@@ -11,9 +11,3 @@ export const navigation = [
   { href: "/proyectos", label: "Proyectos" },
   { href: "/contacto", label: "Contacto" },
 ] as const;
-
-/** Páginas legales: todavía no existen, los links quedan preparados. */
-export const legalLinks = [
-  { href: "/cookies", label: "cookies" },
-  { href: "/privacidad", label: "privacidad" },
-] as const;

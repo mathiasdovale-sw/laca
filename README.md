@@ -90,6 +90,7 @@ Se entra en `/studio` (en producción: `https://estudiolaca.com/studio`) con una
 | **Proyectos**     | Lista ordenable arrastrando. El orden se usa en `/proyectos`. Cada uno tiene un estado en texto libre y dos imágenes (ver abajo).           |
 | **Estudio**       | Documento único: texto, integrantes del equipo (con descripción opcional) y etapas de “Cómo trabajamos”.                                    |
 | **Configuración** | Documento único: nombre del sitio, contacto, redes (Instagram, LinkedIn), textos del bloque de contacto y el email que recibe los mensajes. |
+| **Legales**       | Páginas legales (privacidad, cookies, términos…), ordenables arrastrando. Se enlazan desde el footer.                                       |
 
 Cada proyecto tiene dos imágenes principales:
 
@@ -127,26 +128,26 @@ npm run typegen
 
 ## Webhook de revalidación
 
-Las páginas se generan en el build y quedan cacheadas **sin vencimiento**. Cuando alguien publica en el Studio, Sanity avisa a `/api/revalidate`, que invalida solo las páginas afectadas (por tipo de documento: `project`, `home`, `studio`, `settings`). La siguiente visita ya ve el contenido nuevo.
+Las páginas se generan en el build y quedan cacheadas **sin vencimiento**. Cuando alguien publica en el Studio, Sanity avisa a `/api/revalidate`, que invalida solo las páginas afectadas (por tipo de documento: `project`, `home`, `studio`, `settings`, `legalPage`). La siguiente visita ya ve el contenido nuevo.
 
 ### Configurarlo en Sanity
 
 1. Entrá a <https://www.sanity.io/manage> → proyecto → **API** → **Webhooks** → **Create webhook**.
 2. Completá:
 
-   | Campo       | Valor                                                |
-   | ----------- | ---------------------------------------------------- |
-   | Name        | `Revalidar sitio`                                    |
-   | URL         | `https://estudiolaca.com/api/revalidate`             |
-   | Dataset     | `production`                                         |
-   | Trigger on  | ✅ Create ✅ Update ✅ Delete                        |
-   | Filter      | `_type in ["project", "home", "studio", "settings"]` |
-   | Projection  | `{_type}`                                            |
-   | Status      | ✅ Enable webhook                                    |
-   | HTTP method | `POST`                                               |
-   | API version | la más reciente                                      |
-   | Drafts      | ❌ (sin tildar: solo contenido publicado)            |
-   | Secret      | el mismo valor que `SANITY_REVALIDATE_SECRET`        |
+   | Campo       | Valor                                                             |
+   | ----------- | ----------------------------------------------------------------- |
+   | Name        | `Revalidar sitio`                                                 |
+   | URL         | `https://estudiolaca.com/api/revalidate`                          |
+   | Dataset     | `production`                                                      |
+   | Trigger on  | ✅ Create ✅ Update ✅ Delete                                     |
+   | Filter      | `_type in ["project", "home", "studio", "settings", "legalPage"]` |
+   | Projection  | `{_type}`                                                         |
+   | Status      | ✅ Enable webhook                                                 |
+   | HTTP method | `POST`                                                            |
+   | API version | la más reciente                                                   |
+   | Drafts      | ❌ (sin tildar: solo contenido publicado)                         |
+   | Secret      | el mismo valor que `SANITY_REVALIDATE_SECRET`                     |
 
 3. Guardar. Para probarlo: publicá un cambio y mirá la pestaña **Attempts log** del webhook (tiene que responder `200`).
 
@@ -266,6 +267,7 @@ Cada push a `main` genera un deploy nuevo. El contenido **no** depende de los de
    │  │  ├─ page.tsx         Inicio
    │  │  ├─ proyectos/       Listado y detalle ([slug])
    │  │  ├─ estudio/
+│  │  ├─ legales/         Páginas legales ([slug])
    │  │  └─ contacto/        Página, server action y validación (zod)
    │  ├─ studio/             Studio de Sanity en /studio
    │  ├─ api/revalidate/     Webhook de Sanity
@@ -285,7 +287,7 @@ Cada push a `main` genera un deploy nuevo. El contenido **no** depende de los de
 
 **Diseño**: colores y tipografía en `src/app/globals.css` (`@theme`) y `src/lib/fonts.ts`; estructura común (header, bloque de contacto, footer) en `src/components/SiteShell.tsx`; piezas reutilizables (etiquetas, botones con flecha) en `src/components/ui.tsx`; el logo en `src/components/Logo.tsx`.
 
-Los links legales del footer (`/cookies`, `/privacidad`) están preparados pero esas páginas todavía no existen (dan 404).
+Las páginas legales (privacidad, cookies, etc.) se crean en el Studio, en **Legales**: cada una queda en `/legales/<slug>` y aparece en la columna “Legal” del footer, en el orden de la lista. Si no hay ninguna publicada, la columna no se muestra.
 
 ## Notas de versiones
 

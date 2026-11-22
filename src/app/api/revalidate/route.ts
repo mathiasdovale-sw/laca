@@ -14,6 +14,7 @@ const cacheTags = new Set<string>([
   "project",
   "studio",
   "settings",
+  "legalPage",
 ] satisfies CacheTag[]);
 
 export async function POST(request: NextRequest) {

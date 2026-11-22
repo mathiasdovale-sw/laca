@@ -107,6 +107,35 @@ export const studioQuery = defineQuery(`
   }
 `);
 
+// Links de la columna “Legal” del footer, en el orden del Studio.
+export const legalLinksQuery = defineQuery(`
+  *[_type == "legalPage" && defined(slug.current)] | order(orderRank) {
+    _id,
+    "label": coalesce(footerLabel, title),
+    "slug": slug.current
+  }
+`);
+
+export const legalPageQuery = defineQuery(`
+  *[_type == "legalPage" && slug.current == $slug][0] {
+    title,
+    updatedAt,
+    body,
+    ${seo}
+  }
+`);
+
+export const legalSlugsQuery = defineQuery(`
+  *[_type == "legalPage" && defined(slug.current)].slug.current
+`);
+
+export const legalSitemapQuery = defineQuery(`
+  *[_type == "legalPage" && defined(slug.current)] {
+    "slug": slug.current,
+    _updatedAt
+  }
+`);
+
 export const sitemapQuery = defineQuery(`
   *[_type == "project" && defined(slug.current)] {
     "slug": slug.current,

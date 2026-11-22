@@ -46,6 +46,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
 
   return (
     <section
+      data-header-dark
       aria-roledescription="carrusel"
       aria-label="Proyectos"
       className="relative h-[85svh] min-h-[28rem] overflow-hidden bg-neutral-800 text-white md:h-svh"

@@ -1,5 +1,6 @@
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { CogIcon } from "@sanity/icons/Cog";
+import { DocumentTextIcon } from "@sanity/icons/DocumentText";
 import { HomeIcon } from "@sanity/icons/Home";
 import { ProjectsIcon } from "@sanity/icons/Projects";
 import { UsersIcon } from "@sanity/icons/Users";
@@ -49,4 +50,12 @@ export const structure: StructureResolver = (S, context) =>
             .documentId("settings")
             .title("Configuración"),
         ),
+
+      orderableDocumentListDeskItem({
+        type: "legalPage",
+        title: "Legales",
+        icon: DocumentTextIcon,
+        S,
+        context,
+      }),
     ]);
