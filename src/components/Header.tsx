@@ -51,24 +51,24 @@ export function Header() {
       }`}
     >
       {/* Degradés de fondo: se cruzan con un fundido (un background-image no
-          se puede animar). Se extienden un poco por debajo de la barra para
-          que el texto quede sobre la parte más opaca. */}
+          se puede animar). Ocupan exactamente la altura de la barra: arriba
+          son más opacos y en el borde inferior ya son transparentes. */}
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+1.5rem)] bg-[linear-gradient(to_bottom,rgb(0_0_0/0.5),rgb(0_0_0/0.25)_55%,transparent)] transition-opacity duration-500 ${
+        className={`pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,rgb(0_0_0/0.55),transparent)] transition-opacity duration-500 ${
           dark ? "opacity-100" : "opacity-0"
         }`}
       />
       <div
         aria-hidden="true"
-        className={`pointer-events-none absolute inset-x-0 top-0 -z-10 h-[calc(100%+1.5rem)] bg-[linear-gradient(to_bottom,rgb(255_255_255/0.92),rgb(255_255_255/0.7)_50%,transparent)] transition-opacity duration-500 ${
+        className={`pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom,rgb(255_255_255/0.85),rgb(255_255_255/0.55)_50%,transparent)] transition-opacity duration-500 ${
           dark || open ? "opacity-0" : "opacity-100"
         }`}
       />
 
       <Container
         className={`relative z-50 flex items-center justify-between transition-[padding] duration-300 ${
-          scrolled ? "py-4" : "py-6"
+          scrolled ? "py-4" : "py-5"
         }`}
       >
         <Logo className="text-2xl" />
