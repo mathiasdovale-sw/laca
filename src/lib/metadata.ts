@@ -68,5 +68,5 @@ function toDescription(value: string | BlockValue | null | undefined) {
   if (!value) return undefined;
   const text = typeof value === "string" ? value : toPlainText(toBlocks(value));
   const clean = text.replace(/\s+/g, " ").trim();
-  return clean.length > 160 ? `${clean.slice(0, 157).trimEnd()}…` : clean;
+  return clean.length > 155 ? `${clean.slice(0, 152).trimEnd()}…` : clean;
 }

@@ -1,9 +1,9 @@
-import { category } from "./documents/category";
 import { home } from "./documents/home";
 import { project } from "./documents/project";
 import { settings } from "./documents/settings";
 import { studio } from "./documents/studio";
 import { imageWithAlt } from "./objects/imageWithAlt";
+import { processStep } from "./objects/processStep";
 import { richText } from "./objects/richText";
 import { seo } from "./objects/seo";
 import { teamMember } from "./objects/teamMember";
@@ -12,11 +12,11 @@ export const schemaTypes = [
   // Documentos
   home,
   project,
-  category,
   studio,
   settings,
   // Objetos
   imageWithAlt,
+  processStep,
   richText,
   seo,
   teamMember,

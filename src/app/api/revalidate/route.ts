@@ -12,7 +12,6 @@ import type { CacheTag } from "@/sanity/lib/fetch";
 const cacheTags = new Set<string>([
   "home",
   "project",
-  "category",
   "studio",
   "settings",
 ] satisfies CacheTag[]);

@@ -19,6 +19,26 @@
 
 html {
   scroll-behavior: smooth;
+  /* El header queda fijo: que los saltos a #contacto no queden tapados. */
+  scroll-padding-top: 5rem;
+}
+
+/* Aparición al entrar en pantalla (src/components/Reveal.tsx). Solo se oculta
+   si hay JavaScript y no se pidió reducir el movimiento. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .reveal {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition:
+      opacity 0.8s ease-out,
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal[data-visible] {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

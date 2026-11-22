@@ -36,13 +36,11 @@ export const project = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "category",
-      title: "Categoría",
-      description: "Las categorías se administran en la sección “Categorías”.",
-      type: "reference",
-      to: [{ type: "category" }],
+      name: "status",
+      title: "Estado",
+      description: "Texto libre. Ej.: Construido, En obra, En proyecto.",
+      type: "string",
       group: "content",
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: "location",
@@ -74,9 +72,18 @@ export const project = defineType({
     }),
     defineField({
       name: "coverImage",
-      title: "Imagen de portada",
+      title: "Imagen de portada (vertical)",
       description:
-        "Se usa en los listados y al principio de la página del proyecto.",
+        "Se muestra en la grilla de proyectos del inicio y en /proyectos. Vertical 4:5, ideal 1920 × 2400 px.",
+      type: "imageWithAlt",
+      group: "images",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "bannerImage",
+      title: "Imagen de banner (horizontal)",
+      description:
+        "Se muestra a pantalla completa en el carrusel del inicio y arriba de todo en la página del proyecto. Horizontal, ideal 2560 × 1440 px (16:9).",
       type: "imageWithAlt",
       group: "images",
       validation: (rule) => rule.required(),
@@ -100,14 +107,14 @@ export const project = defineType({
   preview: {
     select: {
       title: "title",
-      category: "category.title",
+      status: "status",
       year: "year",
       media: "coverImage",
     },
-    prepare({ title, category, year, media }) {
+    prepare({ title, status, year, media }) {
       return {
         title,
-        subtitle: [category, year].filter(Boolean).join(" · "),
+        subtitle: [status, year].filter(Boolean).join(" · "),
         media,
       };
     },

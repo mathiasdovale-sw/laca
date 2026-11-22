@@ -30,7 +30,7 @@ export const settings = defineType({
       rows: 3,
       group: "general",
       validation: (rule) =>
-        rule.max(160).warning("Conviene que no pase de 160 caracteres."),
+        rule.max(155).warning("Conviene que no pase de 155 caracteres."),
     }),
     defineField({
       name: "email",

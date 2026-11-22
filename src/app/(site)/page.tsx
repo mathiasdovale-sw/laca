@@ -3,6 +3,7 @@ import { PortableText } from "next-sanity";
 
 import { Container } from "@/components/Container";
 import { HeroCarousel } from "@/components/HeroCarousel";
+import { Reveal } from "@/components/Reveal";
 import { ProjectGrid } from "@/components/ProjectCard";
 import { toBlocks } from "@/components/RichText";
 import { SanityImage } from "@/components/SanityImage";
@@ -18,7 +19,9 @@ async function getHome() {
 
 export async function generateMetadata(): Promise<Metadata> {
   const home = await getHome();
-  return buildMetadata({ seo: home?.seo, description: home?.intro, path: "/" });
+  // Sin descripción propia en el bloque SEO, se usa la del sitio
+  // (Configuración → Descripción del sitio), pensada para Google.
+  return buildMetadata({ seo: home?.seo, path: "/" });
 }
 
 export default async function HomePage() {
@@ -36,9 +39,9 @@ export default async function HomePage() {
 
       {home?.intro && home.intro.length > 0 && (
         <Container className="py-16 md:py-24">
-          <div className="max-w-5xl text-lg leading-snug md:text-xl lg:text-[1.375rem] [&_strong]:font-semibold">
+          <Reveal className="max-w-5xl text-lg leading-snug md:text-xl lg:text-[1.375rem] [&_strong]:font-semibold">
             <PortableText value={toBlocks(home.intro)} />
-          </div>
+          </Reveal>
         </Container>
       )}
 
@@ -59,12 +62,14 @@ export default async function HomePage() {
               (El estudio)
             </Label>
 
-            <p className="mt-4 max-w-4xl text-2xl leading-tight tracking-tight md:text-[2rem]">
-              {home.studioHeading}{" "}
-              <span className="text-muted">{home.studioText}</span>
-            </p>
+            <Reveal>
+              <p className="mt-4 max-w-4xl text-2xl leading-tight tracking-tight md:text-[2rem]">
+                {home.studioHeading}{" "}
+                <span className="text-muted">{home.studioText}</span>
+              </p>
+            </Reveal>
 
-            <div className="mt-12 grid items-center gap-10 md:mt-16 md:grid-cols-[4fr_3fr]">
+            <Reveal className="mt-12 grid items-center gap-10 md:mt-16 md:grid-cols-[4fr_3fr]">
               {home.studioImage && (
                 <div className="relative aspect-[4/3] overflow-hidden bg-neutral-100">
                   <SanityImage
@@ -78,7 +83,7 @@ export default async function HomePage() {
               <div className="md:flex md:justify-center">
                 <PillLink href="/estudio">Conocé el estudio</PillLink>
               </div>
-            </div>
+            </Reveal>
           </section>
         </Container>
       )}

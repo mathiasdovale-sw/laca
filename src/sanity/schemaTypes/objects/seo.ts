@@ -21,7 +21,7 @@ export const seo = defineType({
       type: "text",
       rows: 3,
       validation: (rule) =>
-        rule.max(160).warning("Conviene que no pase de 160 caracteres."),
+        rule.max(155).warning("Conviene que no pase de 155 caracteres."),
     }),
     defineField({
       name: "image",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Container } from "@/components/Container";
+import { Reveal } from "@/components/Reveal";
 import { RichText } from "@/components/RichText";
 import { SanityImage } from "@/components/SanityImage";
 import { Label } from "@/components/ui";
@@ -21,7 +22,7 @@ async function getProject(slug: string) {
   return sanityFetch({
     query: projectQuery,
     params: { slug },
-    tags: ["project", "category"],
+    tags: ["project"],
   });
 }
 
@@ -36,7 +37,7 @@ export async function generateMetadata({
     seo: project.seo,
     title: project.title,
     description: project.description,
-    image: project.coverImage,
+    image: project.bannerImage,
     path: `/proyectos/${slug}`,
   });
 }
@@ -49,7 +50,7 @@ export default async function ProjectPage({
   if (!project) notFound();
 
   const facts = [
-    { label: "Categoría", value: project.category },
+    { label: "Estado", value: project.status },
     { label: "Ubicación", value: project.location },
     { label: "Año", value: project.year },
     {
@@ -77,25 +78,26 @@ export default async function ProjectPage({
         )}
 
         <SanityImage
-          image={project.coverImage}
+          image={project.bannerImage}
           sizes="100vw"
           preload
           className="mt-10 h-auto w-full"
         />
 
-        <div className="mt-12 max-w-3xl text-lg leading-relaxed md:mt-16">
+        <div className="mx-auto mt-12 max-w-3xl text-center text-lg leading-relaxed md:mt-16">
           <RichText value={project.description} />
         </div>
 
         {project.gallery && project.gallery.length > 0 && (
           <div className="mt-12 grid gap-6 sm:grid-cols-2 md:mt-16 md:gap-10">
-            {project.gallery.map((image) => (
-              <SanityImage
-                key={image._key}
-                image={image}
-                sizes="(min-width: 640px) 50vw, 100vw"
-                className="h-auto w-full"
-              />
+            {project.gallery.map((image, i) => (
+              <Reveal key={image._key} delay={(i % 2) * 120}>
+                <SanityImage
+                  image={image}
+                  sizes="(min-width: 640px) 50vw, 100vw"
+                  className="h-auto w-full"
+                />
+              </Reveal>
             ))}
           </div>
         )}

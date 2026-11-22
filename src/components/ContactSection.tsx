@@ -26,6 +26,9 @@ export async function ContactSection() {
     { label: "Estudio", value: settings?.location, href: null },
   ].filter((detail) => detail.value);
 
+  const instagram = settings?.instagram;
+  const instagramHandle = instagram && handleFromUrl(instagram);
+
   return (
     <section
       id="contacto"
@@ -48,28 +51,77 @@ export async function ContactSection() {
         </div>
 
         <div className="mt-12 grid gap-12 md:mt-16 lg:grid-cols-[2fr_3fr]">
-          <dl className="space-y-8">
-            {details.map((detail) => (
-              <div key={detail.label}>
-                <Label as="dt" className="mb-2 text-white/50">
-                  {detail.label}
-                </Label>
-                <dd className="text-base">
-                  {detail.href ? (
-                    <a href={detail.href} className="hover:underline">
-                      {detail.value}
-                    </a>
-                  ) : (
-                    detail.value
-                  )}
-                </dd>
+          <div className="space-y-10">
+            <dl className="space-y-8">
+              {details.map((detail) => (
+                <div key={detail.label}>
+                  <Label as="dt" className="mb-2 text-white/50">
+                    {detail.label}
+                  </Label>
+                  <dd className="text-base">
+                    {detail.href ? (
+                      <a href={detail.href} className="hover:underline">
+                        {detail.value}
+                      </a>
+                    ) : (
+                      detail.value
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            {instagram && (
+              <div>
+                <Label className="mb-3 text-white/50">Seguinos</Label>
+                <a
+                  href={instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 rounded-full border border-white/40 py-3 pr-6 pl-4 text-base transition-colors hover:bg-white hover:text-foreground"
+                >
+                  <InstagramIcon />
+                  <span>
+                    {instagramHandle ? `@${instagramHandle}` : "Instagram"}
+                  </span>
+                  <span aria-hidden="true">↗</span>
+                  <span className="sr-only">
+                    (Instagram, se abre en otra pestaña)
+                  </span>
+                </a>
               </div>
-            ))}
-          </dl>
+            )}
+          </div>
 
           <ContactForm />
         </div>
       </Container>
     </section>
+  );
+}
+
+/** “https://www.instagram.com/estudiolaca/” → “estudiolaca”. */
+function handleFromUrl(url: string) {
+  try {
+    return new URL(url).pathname.split("/").find(Boolean) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function InstagramIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="size-5"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
   );
 }

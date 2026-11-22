@@ -19,6 +19,7 @@ export type TeamMember = {
   _type: "teamMember";
   name: string;
   role?: string;
+  bio?: string;
   photo?: ImageWithAlt;
 };
 
@@ -47,6 +48,12 @@ export type RichText = Array<{
   _type: "block";
   _key: string;
 }>;
+
+export type ProcessStep = {
+  _type: "processStep";
+  title: string;
+  text?: string;
+};
 
 export type SanityImageAssetReference = {
   _ref: string;
@@ -97,14 +104,13 @@ export type Studio = {
       _key: string;
     } & TeamMember
   >;
+  processTitle?: string;
+  process?: Array<
+    {
+      _key: string;
+    } & ProcessStep
+  >;
   seo?: Seo;
-};
-
-export type CategoryReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "category";
 };
 
 export type Project = {
@@ -116,27 +122,19 @@ export type Project = {
   orderRank?: string;
   title: string;
   slug: Slug;
-  category: CategoryReference;
+  status?: string;
   location?: string;
   year?: number;
   area?: number;
   description?: RichText;
   coverImage: ImageWithAlt;
+  bannerImage: ImageWithAlt;
   gallery?: Array<
     {
       _key: string;
     } & ImageWithAlt
   >;
   seo?: Seo;
-};
-
-export type Category = {
-  _id: string;
-  _type: "category";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title: string;
 };
 
 export type Slug = {
@@ -305,13 +303,12 @@ export type AllSanitySchemaTypes =
   | TeamMember
   | Seo
   | RichText
+  | ProcessStep
   | SanityImageAssetReference
   | ImageWithAlt
   | Settings
   | Studio
-  | CategoryReference
   | Project
-  | Category
   | Slug
   | ProjectReference
   | Home
@@ -353,13 +350,13 @@ export type ContactSettingsQueryResult = {
 
 // Source: src/sanity/lib/queries.ts
 // Variable: homeQuery
-// Query: *[_type == "home" && _id == "home"][0] {    heroProjects[]-> {  _id,  title,  "slug": slug.current,  coverImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},  location,  year},    intro,    featuredProjects[]-> {  _id,  title,  "slug": slug.current,  coverImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},  location,  year},    studioHeading,    studioText,    studioImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
+// Query: *[_type == "home" && _id == "home"][0] {    heroProjects[]-> {  _id,  title,  "slug": slug.current,  "image": coalesce(bannerImage, coverImage) {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},  location},    intro,    featuredProjects[]-> {  _id,  title,  "slug": slug.current,  coverImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},  location,  year},    studioHeading,    studioText,    studioImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
 export type HomeQueryResult = {
   heroProjects: Array<{
     _id: string;
     title: string;
     slug: string;
-    coverImage: {
+    image: {
       _key: null;
       alt: string;
       hotspot: {
@@ -377,7 +374,6 @@ export type HomeQueryResult = {
       } | null;
     };
     location: string | null;
-    year: number | null;
   }> | null;
   intro: Array<{
     children?: Array<{
@@ -489,7 +485,7 @@ export type ProjectsQueryResult = Array<{
 
 // Source: src/sanity/lib/queries.ts
 // Variable: projectQuery
-// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    "slug": slug.current,    coverImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    "category": category->title,    location,    year,    area,    description,    gallery[] {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
+// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    "slug": slug.current,    coverImage {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    "bannerImage": coalesce(bannerImage, coverImage) {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    status,    location,    year,    area,    description,    gallery[] {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }},    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
 export type ProjectQueryResult = {
   _id: string;
   title: string;
@@ -511,7 +507,24 @@ export type ProjectQueryResult = {
       } | null;
     } | null;
   };
-  category: string;
+  bannerImage: {
+    _key: null;
+    alt: string;
+    hotspot: {
+      x: number;
+      y: number;
+    } | null;
+    asset: {
+      _id: string;
+      metadata: {
+        dimensions: {
+          width: number;
+          height: number;
+        } | null;
+      } | null;
+    } | null;
+  };
+  status: string | null;
   location: string | null;
   year: number | null;
   area: number | null;
@@ -563,7 +576,7 @@ export type ProjectSlugsQueryResult = Array<string>;
 
 // Source: src/sanity/lib/queries.ts
 // Variable: studioQuery
-// Query: *[_type == "studio" && _id == "studio"][0] {    title,    body,    team[] { _key, name, role, photo {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} },    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
+// Query: *[_type == "studio" && _id == "studio"][0] {    title,    body,    team[] { _key, name, role, bio, photo {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} },    processTitle,    process[] { _key, title, text },    seo { title, description, image {  _key,  alt,  hotspot { x, y },  asset->{ _id, metadata { dimensions { width, height } } }} }  }
 export type StudioQueryResult = {
   title: string;
   body: RichText | null;
@@ -571,6 +584,7 @@ export type StudioQueryResult = {
     _key: string;
     name: string;
     role: string | null;
+    bio: string | null;
     photo: {
       _key: null;
       alt: string;
@@ -588,6 +602,12 @@ export type StudioQueryResult = {
         } | null;
       } | null;
     } | null;
+  }> | null;
+  processTitle: string | null;
+  process: Array<{
+    _key: string;
+    title: string;
+    text: string | null;
   }> | null;
   seo: {
     title: string | null;
@@ -625,11 +645,11 @@ declare global {
   interface SanityQueries {
     '\n  *[_type == "settings" && _id == "settings"][0] {\n    siteTitle,\n    siteDescription,\n    email,\n    phone,\n    address,\n    location,\n    mapsUrl,\n    instagram,\n    linkedin,\n    contactTitle,\n    contactText\n  }\n': SettingsQueryResult;
     '\n  *[_type == "settings" && _id == "settings"][0] { siteTitle, contactFormRecipient }\n': ContactSettingsQueryResult;
-    '\n  *[_type == "home" && _id == "home"][0] {\n    heroProjects[]-> {\n  _id,\n  title,\n  "slug": slug.current,\n  coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n  location,\n  year\n},\n    intro,\n    featuredProjects[]-> {\n  _id,\n  title,\n  "slug": slug.current,\n  coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n  location,\n  year\n},\n    studioHeading,\n    studioText,\n    studioImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': HomeQueryResult;
+    '\n  *[_type == "home" && _id == "home"][0] {\n    heroProjects[]-> {\n  _id,\n  title,\n  "slug": slug.current,\n  "image": coalesce(bannerImage, coverImage) {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n  location\n},\n    intro,\n    featuredProjects[]-> {\n  _id,\n  title,\n  "slug": slug.current,\n  coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n  location,\n  year\n},\n    studioHeading,\n    studioText,\n    studioImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': HomeQueryResult;
     '\n  *[_type == "project" && defined(slug.current)] | order(orderRank) {\n    _id,\n    title,\n    "slug": slug.current,\n    coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    location,\n    year\n  }\n': ProjectsQueryResult;
-    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    "slug": slug.current,\n    coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    "category": category->title,\n    location,\n    year,\n    area,\n    description,\n    gallery[] {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': ProjectQueryResult;
+    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    "slug": slug.current,\n    coverImage {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    "bannerImage": coalesce(bannerImage, coverImage) {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    status,\n    location,\n    year,\n    area,\n    description,\n    gallery[] {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n},\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': ProjectQueryResult;
     '\n  *[_type == "project" && defined(slug.current)].slug.current\n': ProjectSlugsQueryResult;
-    '\n  *[_type == "studio" && _id == "studio"][0] {\n    title,\n    body,\n    team[] { _key, name, role, photo {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} },\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': StudioQueryResult;
+    '\n  *[_type == "studio" && _id == "studio"][0] {\n    title,\n    body,\n    team[] { _key, name, role, bio, photo {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} },\n    processTitle,\n    process[] { _key, title, text },\n    seo { title, description, image {\n  _key,\n  alt,\n  hotspot { x, y },\n  asset->{ _id, metadata { dimensions { width, height } } }\n} }\n  }\n': StudioQueryResult;
     '\n  *[_type == "project" && defined(slug.current)] {\n    "slug": slug.current,\n    _updatedAt\n  }\n': SitemapQueryResult;
   }
 }

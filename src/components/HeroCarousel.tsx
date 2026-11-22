@@ -3,11 +3,19 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
-import type { ProjectCardData } from "./ProjectCard";
-import { SanityImage } from "./SanityImage";
+import { SanityImage, type SanityImageValue } from "./SanityImage";
 import { Label, PillLink } from "./ui";
 
 const INTERVAL_MS = 5000;
+
+export type HeroSlide = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  /** Imagen de banner (horizontal) del proyecto. */
+  image: SanityImageValue | null;
+  location: string | null;
+};
 
 /**
  * Carrusel a pantalla completa del inicio. Avanza cada 5 segundos con un
@@ -15,7 +23,7 @@ const INTERVAL_MS = 5000;
  * o el foco del teclado están encima, y no avanza solo si el sistema tiene
  * activada la opción de reducir movimiento.
  */
-export function HeroCarousel({ slides }: { slides: ProjectCardData[] }) {
+export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
@@ -66,7 +74,7 @@ export function HeroCarousel({ slides }: { slides: ProjectCardData[] }) {
           }`}
         >
           <SanityImage
-            image={slide.coverImage}
+            image={slide.image}
             fill
             sizes="100vw"
             preload={i === 0}

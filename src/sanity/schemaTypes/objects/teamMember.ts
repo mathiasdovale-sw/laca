@@ -20,6 +20,14 @@ export const teamMember = defineType({
       type: "string",
     }),
     defineField({
+      name: "bio",
+      title: "Descripción",
+      description:
+        "Se muestra al lado de la foto. Dejá una línea en blanco para separar párrafos.",
+      type: "text",
+      rows: 5,
+    }),
+    defineField({
       name: "photo",
       title: "Foto",
       type: "imageWithAlt",

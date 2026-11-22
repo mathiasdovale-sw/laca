@@ -89,17 +89,12 @@ async function main() {
   const { projectId, dataset } = client.config();
   console.log(`Cargando contenido de ejemplo en ${projectId}/${dataset}…`);
 
-  const categories = [
-    { _id: "category-vivienda", _type: "category", title: "Vivienda" },
-    { _id: "category-comercial", _type: "category", title: "Comercial" },
-  ];
-
   const projectsData = [
     {
       id: "project-casa-del-bosque",
       title: "Casa del Bosque",
       slug: "casa-del-bosque",
-      category: "category-vivienda",
+      status: "Construido",
       location: "Pilar, Buenos Aires",
       year: 2023,
       area: 320,
@@ -109,7 +104,7 @@ async function main() {
       id: "project-local-palermo",
       title: "Local Palermo",
       slug: "local-palermo",
-      category: "category-comercial",
+      status: "Construido",
       location: "Palermo, CABA",
       year: 2022,
       area: 85,
@@ -119,7 +114,7 @@ async function main() {
       id: "project-departamento-nunez",
       title: "Departamento Núñez",
       slug: "departamento-nunez",
-      category: "category-vivienda",
+      status: "En obra",
       location: "Núñez, CABA",
       year: 2021,
       area: 110,
@@ -135,6 +130,15 @@ async function main() {
       `${p.slug}-portada`,
       p.shade,
       `Portada de ${p.title}`,
+      1920,
+      2400,
+    );
+    const banner = await uploadImage(
+      `${p.slug}-banner`,
+      p.shade,
+      `${p.title}, vista general`,
+      2560,
+      1440,
     );
     const gallery = await Promise.all(
       [1, 2].map(async (n) => ({
@@ -152,11 +156,12 @@ async function main() {
       orderRank: rank.toString(),
       title: p.title,
       slug: { _type: "slug", current: p.slug },
-      category: { _type: "reference", _ref: p.category },
+      status: p.status,
       location: p.location,
       year: p.year,
       area: p.area,
       coverImage: cover,
+      bannerImage: banner,
       gallery,
       description: [
         block(
@@ -189,7 +194,11 @@ async function main() {
       block("s2", "Otro párrafo de ejemplo para completar la página."),
     ],
     team: [
-      { name: "Nombre Apellido", role: "Socio fundador" },
+      {
+        name: "Nombre Apellido",
+        role: "Socio fundador",
+        bio: "Texto de ejemplo sobre la formación y la experiencia del fundador.",
+      },
       { name: "Nombre Apellido", role: "Arquitecta" },
       { name: "Nombre Apellido", role: "Colaborador" },
     ].map((member, i) => ({
@@ -198,6 +207,15 @@ async function main() {
       ...member,
       photo: teamPhotos[i],
     })),
+    processTitle: "Cómo trabajamos",
+    process: ["Reunión y visita", "Anteproyecto", "Proyecto", "Obra"].map(
+      (title, i) => ({
+        _type: "processStep",
+        _key: `step${i + 1}`,
+        title,
+        text: "Texto de ejemplo de esta etapa.",
+      }),
+    ),
   };
 
   const projectRefs = projects.map((p) => ({
@@ -249,7 +267,8 @@ async function main() {
     _id: "settings",
     _type: "settings",
     siteTitle: "laca.estudio",
-    siteDescription: "Estudio de arquitectura en Buenos Aires.",
+    siteDescription:
+      "laca.estudio, estudio de arquitectura en Buenos Aires especializado en proyectos residenciales. Acompañamos cada proyecto desde la idea hasta la obra.",
     email: "hola@estudiolaca.com",
     phone: "+54 11 5555-0000",
     address: "Av. Ejemplo 1234, Piso 5\nCABA, Buenos Aires",
@@ -264,21 +283,13 @@ async function main() {
   };
 
   const tx = client.transaction();
-  const docs: SanityDocumentStub[] = [
-    ...categories,
-    ...projects,
-    studio,
-    home,
-    settings,
-  ];
+  const docs: SanityDocumentStub[] = [...projects, studio, home, settings];
   for (const doc of docs) {
     tx.createOrReplace(doc);
   }
   await tx.commit();
 
-  console.log(
-    "Listo: 2 categorías, 3 proyectos, Estudio, Inicio y Configuración.",
-  );
+  console.log("Listo: 3 proyectos, Estudio, Inicio y Configuración.");
 }
 
 main().catch((error) => {

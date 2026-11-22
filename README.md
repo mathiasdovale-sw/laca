@@ -52,7 +52,7 @@ npx sanity login    # una sola vez, abre el navegador
 npm run seed
 ```
 
-Carga 2 categorías, 3 proyectos con imágenes placeholder, la página Estudio, Inicio y Configuración con datos de contacto inventados. Se puede volver a correr: reemplaza los mismos documentos sin duplicarlos. **Ojo**: si ya editaste esos documentos en el Studio, los sobrescribe.
+Carga 3 proyectos con imágenes placeholder, la página Estudio, Inicio y Configuración con datos de contacto inventados. Se puede volver a correr: reemplaza los mismos documentos sin duplicarlos. **Ojo**: si ya editaste esos documentos en el Studio, los sobrescribe.
 
 El script escribe directo en el dataset (no pasa por el webhook): si ya habías levantado el sitio antes, borrá `.next/cache` para verlo.
 
@@ -87,10 +87,14 @@ Se entra en `/studio` (en producción: `https://estudiolaca.com/studio`) con una
 | Sección           | Qué es                                                                                                                                      |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Inicio**        | Documento único: proyectos del carrusel, texto de presentación, proyectos destacados y bloque Estudio.                                      |
-| **Proyectos**     | Lista ordenable arrastrando. El orden se usa en `/proyectos`.                                                                               |
-| **Categorías**    | Tipologías que se asignan a los proyectos (se pueden crear, renombrar y borrar si no están en uso).                                         |
-| **Estudio**       | Documento único: texto e integrantes del equipo.                                                                                            |
+| **Proyectos**     | Lista ordenable arrastrando. El orden se usa en `/proyectos`. Cada uno tiene un estado en texto libre y dos imágenes (ver abajo).           |
+| **Estudio**       | Documento único: texto, integrantes del equipo (con descripción opcional) y etapas de “Cómo trabajamos”.                                    |
 | **Configuración** | Documento único: nombre del sitio, contacto, redes (Instagram, LinkedIn), textos del bloque de contacto y el email que recibe los mensajes. |
+
+Cada proyecto tiene dos imágenes principales:
+
+- **Portada (vertical)**: 4:5, ideal 1920 × 2400 px. Se usa en las tarjetas de la grilla del inicio y de `/proyectos`.
+- **Banner (horizontal)**: ideal 2560 × 1440 px (16:9). Se usa en el carrusel del inicio, arriba de la página del proyecto y al compartir en redes. Si falta, se usa la portada.
 
 Todas las imágenes piden **texto alternativo obligatorio**. Cada documento tiene un bloque **SEO** opcional; si queda vacío se usan el título, el texto y la imagen principal.
 
@@ -123,26 +127,26 @@ npm run typegen
 
 ## Webhook de revalidación
 
-Las páginas se generan en el build y quedan cacheadas **sin vencimiento**. Cuando alguien publica en el Studio, Sanity avisa a `/api/revalidate`, que invalida solo las páginas afectadas (por tipo de documento: `project`, `category`, `home`, `studio`, `settings`). La siguiente visita ya ve el contenido nuevo.
+Las páginas se generan en el build y quedan cacheadas **sin vencimiento**. Cuando alguien publica en el Studio, Sanity avisa a `/api/revalidate`, que invalida solo las páginas afectadas (por tipo de documento: `project`, `home`, `studio`, `settings`). La siguiente visita ya ve el contenido nuevo.
 
 ### Configurarlo en Sanity
 
 1. Entrá a <https://www.sanity.io/manage> → proyecto → **API** → **Webhooks** → **Create webhook**.
 2. Completá:
 
-   | Campo       | Valor                                                            |
-   | ----------- | ---------------------------------------------------------------- |
-   | Name        | `Revalidar sitio`                                                |
-   | URL         | `https://estudiolaca.com/api/revalidate`                         |
-   | Dataset     | `production`                                                     |
-   | Trigger on  | ✅ Create ✅ Update ✅ Delete                                    |
-   | Filter      | `_type in ["project", "category", "home", "studio", "settings"]` |
-   | Projection  | `{_type}`                                                        |
-   | Status      | ✅ Enable webhook                                                |
-   | HTTP method | `POST`                                                           |
-   | API version | la más reciente                                                  |
-   | Drafts      | ❌ (sin tildar: solo contenido publicado)                        |
-   | Secret      | el mismo valor que `SANITY_REVALIDATE_SECRET`                    |
+   | Campo       | Valor                                                |
+   | ----------- | ---------------------------------------------------- |
+   | Name        | `Revalidar sitio`                                    |
+   | URL         | `https://estudiolaca.com/api/revalidate`             |
+   | Dataset     | `production`                                         |
+   | Trigger on  | ✅ Create ✅ Update ✅ Delete                        |
+   | Filter      | `_type in ["project", "home", "studio", "settings"]` |
+   | Projection  | `{_type}`                                            |
+   | Status      | ✅ Enable webhook                                    |
+   | HTTP method | `POST`                                               |
+   | API version | la más reciente                                      |
+   | Drafts      | ❌ (sin tildar: solo contenido publicado)            |
+   | Secret      | el mismo valor que `SANITY_REVALIDATE_SECRET`        |
 
 3. Guardar. Para probarlo: publicá un cambio y mirá la pestaña **Attempts log** del webhook (tiene que responder `200`).
 

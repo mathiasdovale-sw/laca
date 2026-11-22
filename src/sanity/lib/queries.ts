@@ -32,7 +32,7 @@ export const contactSettingsQuery = defineQuery(`
   *[_type == "settings" && _id == "settings"][0] { siteTitle, contactFormRecipient }
 `);
 
-// Datos de un proyecto para tarjetas y carrusel.
+// Datos de un proyecto para las tarjetas (imagen vertical).
 const projectCard = /* groq */ `{
   _id,
   title,
@@ -42,9 +42,19 @@ const projectCard = /* groq */ `{
   year
 }`;
 
+// Datos de un proyecto para el carrusel (imagen horizontal; si falta, la
+// vertical).
+const projectSlide = /* groq */ `{
+  _id,
+  title,
+  "slug": slug.current,
+  "image": coalesce(bannerImage, coverImage) ${image},
+  location
+}`;
+
 export const homeQuery = defineQuery(`
   *[_type == "home" && _id == "home"][0] {
-    heroProjects[]-> ${projectCard},
+    heroProjects[]-> ${projectSlide},
     intro,
     featuredProjects[]-> ${projectCard},
     studioHeading,
@@ -71,7 +81,8 @@ export const projectQuery = defineQuery(`
     title,
     "slug": slug.current,
     coverImage ${image},
-    "category": category->title,
+    "bannerImage": coalesce(bannerImage, coverImage) ${image},
+    status,
     location,
     year,
     area,
@@ -89,7 +100,9 @@ export const studioQuery = defineQuery(`
   *[_type == "studio" && _id == "studio"][0] {
     title,
     body,
-    team[] { _key, name, role, photo ${image} },
+    team[] { _key, name, role, bio, photo ${image} },
+    processTitle,
+    process[] { _key, title, text },
     ${seo}
   }
 `);

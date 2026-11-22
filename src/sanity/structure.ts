@@ -2,7 +2,6 @@ import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import { CogIcon } from "@sanity/icons/Cog";
 import { HomeIcon } from "@sanity/icons/Home";
 import { ProjectsIcon } from "@sanity/icons/Projects";
-import { TagIcon } from "@sanity/icons/Tag";
 import { UsersIcon } from "@sanity/icons/Users";
 import type { StructureResolver } from "sanity/structure";
 
@@ -26,8 +25,6 @@ export const structure: StructureResolver = (S, context) =>
         S,
         context,
       }),
-
-      S.documentTypeListItem("category").title("Categorías").icon(TagIcon),
 
       S.divider(),
 
